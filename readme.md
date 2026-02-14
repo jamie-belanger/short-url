@@ -7,15 +7,11 @@ Since one of the first questions anyone asks these days is predictable: no, this
 
 
 ## Features
-Now:
- * Basic API usage (GET/POST)
- * Slugs stored in memory
+ * Basic API usage (GET/POST/DELETE)
+ * Slugs stored in memory or SQLite
  * Readme with curl examples
  * JSON logging
  * JSON responses
- * SQLite support
-
-Planned:
  * Docker build
 
 
@@ -48,6 +44,27 @@ curl http://localhost:4000/rGu2ae
 ```
 
 Stop the server with `CTRL`+`C`
+
+
+### Building the Docker container
+The provided multi-stage build will handle building the application and packing it a container (about 91 MB on Debian slim).
+
+First, build the container:
+```bash
+docker build . -t short-url-app
+```
+
+Then run it with appropriate environment variables. You can do that with the provided compose file, or manually with something like:
+```bash
+docker run -p 8080:9000 -e PORT=9000 -e DATABASE=memory short-url-app
+```
+(where 8080 would be the port on your machine and 9000 is what the container listens on)
+
+Just remember that if you want to use SQLite you should have a local volume or bind mount so the data can persist:
+```bash
+mkdir ./data
+docker run -p 8080:9000 -e PORT=9000 -e DATABASE=sqlite -v ./data:/app/data short-url-app
+```
 
 
 ## License

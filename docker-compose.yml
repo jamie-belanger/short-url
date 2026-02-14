@@ -1,0 +1,18 @@
+# Sample compose file for short-url
+services:
+  short-url:
+    image: short-url-app
+    build:
+      context: .
+    container_name: short-url
+    ports:
+      # Map whatever port you want on your machine to the port inside the container (defined in env below)
+      - "8080:4000"
+
+    volumes:
+      # If using SQLite mode, you should have a volume or bind mount for the data to persist
+      - ./data:/app/data
+
+    environment:
+      - PORT=4000
+      - DATABASE=sqlite

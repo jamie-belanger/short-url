@@ -148,7 +148,7 @@ func (a *application) TestSlugAvailable(slug string) bool {
 	- link (string) = actual hyperlink to store
 */
 func (a *application) InsertLink(slug string, link string) error {
-	a.logger.Debug("InsertLink", slog.String("slug", slug), slog.String("link", link))
+	a.logger.Info("InsertLink", slog.String("slug", slug), slog.String("link", link))
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
@@ -177,6 +177,7 @@ func (a *application) InsertLink(slug string, link string) error {
 		}
 	}
 
+	a.logger.Info("InsertLink", slog.String("message", "Link inserted"))
 	return nil
 }
 
@@ -188,7 +189,7 @@ func (a *application) InsertLink(slug string, link string) error {
 	- slug (string) = unique slug to delete
 */
 func (a *application) RemoveLink(slug string) error {
-	a.logger.Debug("RemoveLink", slog.String("slug", slug))
+	a.logger.Info("RemoveLink", slog.String("slug", slug))
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
@@ -216,6 +217,7 @@ func (a *application) RemoveLink(slug string) error {
 		}
 	}
 
+	a.logger.Info("RemoveLink", slog.String("message", "Link deleted"))
 	return nil
 }
 
@@ -233,13 +235,14 @@ func (a *application) RemoveLink(slug string) error {
 	- error = if something went wrong, details
 */
 func (a *application) GetLink(slug string) (string, error) {
-	a.logger.Debug("GetLink", slog.String("slug", slug))
+	a.logger.Info("GetLink", slog.String("slug", slug))
 	a.mu.RLock()
 	defer a.mu.RUnlock()
 
 	switch a.dbtype {
 	case DatabaseMemory:
 		if link, ok := a.links[slug]; ok {
+			a.logger.Info("GetLink", slog.String("message", "Link found"), slog.String("link", link))
 			return link, nil
 		}
 
@@ -250,6 +253,7 @@ func (a *application) GetLink(slug string) (string, error) {
 		err := row.Scan(&link)
 		a.logger.Info("GetLink called", slog.String("slug", slug), slog.String("link", link), slog.Any("err", err))
 		if err == nil {
+			a.logger.Info("GetLink", slog.String("message", "Link found"), slog.String("link", link))
 			return link, nil
 		}
 	}
