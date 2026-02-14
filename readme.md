@@ -13,9 +13,9 @@ Now:
  * Readme with curl examples
  * JSON logging
  * JSON responses
+ * SQLite support
 
 Planned:
- * SQLite support
  * Docker build
 
 
@@ -24,6 +24,12 @@ For now, run the application locally with whatever port you want to use:
 ```bash
 go run ./src -port 1234
 ```
+
+By default the application uses a simple memory store. If you want persistent storage, set the database driver to `sqlite`:
+```bash
+go run ./src -port 1234 -database sqlite
+```
+
 
 Then open another terminal window and test with `curl` like this:
 ```bash
