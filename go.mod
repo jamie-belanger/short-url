@@ -1,5 +1,3 @@
-module shorturl.lostluggage.us
+module github.com/jamie-belanger/short-url
 
 go 1.25.7
-
-require github.com/google/uuid v1.6.0
