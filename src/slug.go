@@ -29,7 +29,7 @@ func (a *application) generateSlug(link string) string {
 
 	// This is still too big (44 chars), so let's trim and return the first unique substring we see
 	for i := minimumSlugLength; i < len(slug); i++ {
-		if _, ok := a.links[slug[:i]]; !ok {
+		if ok := a.TestSlugAvailable(slug[:i]); ok {
 			return slug[:i]
 		}
 	}

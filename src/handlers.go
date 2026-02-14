@@ -84,8 +84,11 @@ func (a *application) shortLinkCreate(w http.ResponseWriter, r *http.Request) {
 	// Generate short slug. Passing a GUID in here instead of the link would make this a lot more random.
 	slug := a.generateSlug(userLink)
 
-	// Add to memory map
-	a.links[slug] = userLink
+	// Add to database
+	if err := a.InsertLink(slug, userLink); err != nil {
+		a.sendJsonErrorMessage(w, http.StatusConflict, err.Error())
+		return
+	}
 
 	// return slug to caller
 	w.WriteHeader(http.StatusCreated)
@@ -113,10 +116,35 @@ func (a *application) shortLinkGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check the memory map for this ID
-	if link, ok := a.links[linkId]; ok {
+	// Check the database for this ID
+	if link, err := a.GetLink(linkId); err == nil {
 		json.NewEncoder(w).Encode(retrieveResponse{ Link: link })
 	} else {
-		a.sendJsonErrorMessage(w, http.StatusNotFound, "ID not found")
+		a.sendJsonErrorMessage(w, http.StatusNotFound, err.Error())
+	}
+}
+
+/*
+	Deletes a stored hyperlink using the slug provided in the URL
+
+	# Parameters (URL)
+
+	- id (string) = a slug to retrieve
+*/
+func (a *application) shortLinkDelete(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// First ensure the link ID exists in path; otherwise it's a 400 Bad Request
+	linkId := r.PathValue("id")
+	if "" == linkId {
+		a.sendJsonErrorMessage(w, http.StatusBadRequest, "ID not provided in URL")
+		return
+	}
+
+	// Try to delete link
+	if err := a.RemoveLink(linkId); err == nil {
+		w.WriteHeader(http.StatusNoContent)
+	} else {
+		a.sendJsonErrorMessage(w, http.StatusNotFound, err.Error())
 	}
 }

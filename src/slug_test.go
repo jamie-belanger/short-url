@@ -3,16 +3,17 @@ package main
 import (
 	"testing"
 	"log/slog"
-	"os"
+	//"os"
 )
 
 // Test GenerateSlug method.
 // WARNING: This may fail when comparing slugs if the first (minimumSlugLength) characters are not unique.
 func TestGenerateSlug(t *testing.T) {
 	a := &application{
-		logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions {
+		logger: slog.New(slog.NewTextHandler(t.Output(), &slog.HandlerOptions {
 			Level: slog.LevelDebug,
 		})),
+		dbtype: DatabaseMemory,
 		links:  make(map[string]string),
 	}
 
